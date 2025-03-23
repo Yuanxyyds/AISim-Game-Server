@@ -3,3 +3,7 @@ uvicorn
 websockets
 llama-cpp-python
 sqlalchemy
+torch
+transformers
+bitsandbytes
+accelerate

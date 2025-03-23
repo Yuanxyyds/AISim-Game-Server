@@ -1,7 +1,7 @@
 from llama_cpp import Llama
 import threading
 import time
-from llm import load_models, unload_models
+from llm import load_llama_model, load_deepseek_model, call_deepseek, call_llama
 from prompts.roles import (
     ASSASIN_PROMPT,
     SECRETARY_PROMPT,
@@ -17,8 +17,8 @@ from prompts.actions import (
     MEDIA_CREATOR_INVITER_INITIAL_PROMPT,
 )
 
-load_models()
-from llm import llm2
+load_deepseek_model()
+from llm import llama, deepseek
 
 # Players participating and their roles (in order)
 players = ["Alice", "Bob", "Catherine", "David", "Edison", "Franklin", "Georgia"]
@@ -80,14 +80,14 @@ def simulate_introductions():
             {
                 "role": "user",
                 "content": "Conversation History:\n"
-                + "Georgia: " + MEDIA_CREATOR_INVITER_INITIAL_PROMPT
+                + "Georgia: "
+                + MEDIA_CREATOR_INVITER_INITIAL_PROMPT
                 + "\n\n"
                 + YOUR_TURN_TO_INTRODUCE,
             },
         ]
 
-        response = llm2.create_chat_completion(messages=messages, max_tokens=500)
-        response_text = response["choices"][0]["message"]["content"].strip()
+        response_text = call_deepseek(messages=messages)
 
         # Store in chat history
         chat_history.append({"speaker": player, "content": response_text})
@@ -114,8 +114,7 @@ def simulate_free_talk():
             },
         ]
 
-        response = llm2.create_chat_completion(messages=messages, max_tokens=500)
-        response_text = response["choices"][0]["message"]["content"].strip()
+        response_text = call_deepseek(messages=messages)
 
         # Store conversation in chat history
         chat_history.append({"speaker": speaker, "content": response_text})
