@@ -1,7 +1,7 @@
-from llama_cpp import Llama
-import threading
 import time
-from llm import load_llama_model, load_deepseek_model, call_deepseek, call_llama
+from llm import call_deepseek, call_llama
+from session.shared_queue import simulation_message_queue
+import asyncio
 from prompts.roles import (
     ASSASIN_PROMPT,
     SECRETARY_PROMPT,
@@ -16,9 +16,6 @@ from prompts.actions import (
     YOUR_TURN_TO_INTRODUCE,
     MEDIA_CREATOR_INVITER_INITIAL_PROMPT,
 )
-
-load_deepseek_model()
-from llm import llama, deepseek
 
 # Players participating and their roles (in order)
 players = ["Alice", "Bob", "Catherine", "David", "Edison", "Franklin", "Georgia"]
@@ -58,7 +55,7 @@ def format_chat_history(history, limit=7):
 
 
 # Function to simulate player introductions
-def simulate_introductions():
+async def simulate_introductions():
     print("📢 Starting introductions...")
 
     # The Media Creator starts the conversation
@@ -67,14 +64,13 @@ def simulate_introductions():
     chat_history.append({"speaker": media_creator, "content": first_message})
     print(f"🗣️ {media_creator}: {first_message}\n")
 
-    time.sleep(2)
+    await asyncio.sleep(2)
 
     # Each player introduces themselves
     for player in players:
         if player == media_creator:
-            continue  # Skip Media Creator since they already spoke
+            continue
 
-        chat_context = format_chat_history(chat_history, limit=7)
         messages = [
             {"role": "system", "content": role_prompts[player]},
             {
@@ -87,21 +83,17 @@ def simulate_introductions():
             },
         ]
 
-        response_text = call_deepseek(messages=messages)
-
-        # Store in chat history
+        response_text = call_llama(messages=messages)
         chat_history.append({"speaker": player, "content": response_text})
+        add_message_to_queue(player, response_text)
         print(f"🗣️ {player}: {response_text}\n")
-        time.sleep(2)
+        await asyncio.sleep(2)
 
 
-# Function to simulate free talk session
-def simulate_free_talk():
-    print("💬 Free talk session has started... Players are conversing.")
-
-    for i in range(10):  # Simulate multiple rounds of free talk
-        speaker = players[i % len(players)]  # Rotate turns
-        chat_context = format_chat_history(chat_history, limit=i)
+    # Each player introduces themselves
+    for i in range(100):
+        speaker = players[i % len(players)]
+        chat_context = format_chat_history(chat_history, limit=2)
 
         messages = [
             {"role": "system", "content": role_prompts[speaker]},
@@ -114,14 +106,14 @@ def simulate_free_talk():
             },
         ]
 
-        response_text = call_deepseek(messages=messages)
+        response_text = call_llama(messages=messages)
 
         # Store conversation in chat history
         chat_history.append({"speaker": speaker, "content": response_text})
+        add_message_to_queue(player, response_text)
         print(f"🗣️ {speaker}: {response_text}\n")
-        time.sleep(3)  # Add delay for realism
+        time.sleep(3)
 
-
-simulate_introductions()
-print("\n🎭 Everyone has introduced themselves! Now, let’s begin free talk.\n")
-simulate_free_talk()
+def add_message_to_queue(speaker, content):
+    simulation_message_queue.put({"speaker": speaker, "content": content})
+    print("Added to Queue!")
