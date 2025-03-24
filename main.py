@@ -33,10 +33,12 @@ async def websocket_endpoint(websocket: WebSocket):
             if not simulation_message_queue.empty():
                 print("Message Detected!")
                 message = simulation_message_queue.get()
-                await websocket.send_text(f"{message['speaker']}: {message['content']}")
+                await websocket.send_json(
+                    {"message": message["speaker"], "content": message["content"]}
+                )
+
             await asyncio.sleep(5)
     except WebSocketDisconnect:
         print("❌ Player disconnected")
     finally:
         active_player = None
-    

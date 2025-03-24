@@ -5,7 +5,7 @@ Consider what you want to say in front of the group.
 You may share your thoughts, ask questions, or react to what others have said.
 
 Speak carefully — your words may reveal clues or influence others’ perceptions.  
-**Respond with your speech only. Less than 100 words**
+**Respond with your speech only. Less than 75 words**
 """
 
 YOUR_TURN_TO_INTRODUCE = """
@@ -14,7 +14,7 @@ It is your turn to introduce yourself. Everyone is listening.
 Choose your words wisely—**reveal only what you want others to know**.  
 You may speak openly or keep things vague, depending on your strategy.
 
-**Respond with your speech only. Less than 100 words**
+**Respond with your speech only. Less than 75 words**
 """
 
 

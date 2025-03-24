@@ -91,7 +91,7 @@ async def simulate_introductions():
 
 
     # Each player introduces themselves
-    for i in range(100):
+    for i in range(6):
         speaker = players[i % len(players)]
         chat_context = format_chat_history(chat_history, limit=2)
 
@@ -112,7 +112,7 @@ async def simulate_introductions():
         chat_history.append({"speaker": speaker, "content": response_text})
         add_message_to_queue(player, response_text)
         print(f"🗣️ {speaker}: {response_text}\n")
-        time.sleep(3)
+        await asyncio.sleep(2)
 
 def add_message_to_queue(speaker, content):
     simulation_message_queue.put({"speaker": speaker, "content": content})
