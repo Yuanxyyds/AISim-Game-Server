@@ -1,6 +1,5 @@
-import time
-from llm import call_deepseek, call_llama
-from session.shared_queue import simulation_message_queue
+from resources.llm import call_chat, call_summarizer, _call_deepseek
+from resources.shared_queue import simulation_message_queue
 import asyncio
 from prompts.roles import (
     ASSASIN_PROMPT,
@@ -83,12 +82,11 @@ async def simulate_introductions():
             },
         ]
 
-        response_text = call_llama(messages=messages)
+        response_text = call_chat(messages=messages)
         chat_history.append({"speaker": player, "content": response_text})
         add_message_to_queue(player, response_text)
         print(f"🗣️ {player}: {response_text}\n")
         await asyncio.sleep(2)
-
 
     # Each player introduces themselves
     for i in range(6):
@@ -106,7 +104,7 @@ async def simulate_introductions():
             },
         ]
 
-        response_text = call_llama(messages=messages)
+        response_text = call_chat(messages=messages)
 
         # Store conversation in chat history
         chat_history.append({"speaker": speaker, "content": response_text})
@@ -114,6 +112,9 @@ async def simulate_introductions():
         print(f"🗣️ {speaker}: {response_text}\n")
         await asyncio.sleep(2)
 
+
 def add_message_to_queue(speaker, content):
     simulation_message_queue.put({"speaker": speaker, "content": content})
     print("Added to Queue!")
+
+
